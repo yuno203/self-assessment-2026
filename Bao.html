@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bảng Tự Đánh Giá Nhân Viên</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #e9ecef;
+    padding: 20px;
+    color: #222;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    overflow: hidden;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a73e8, #0d47a1);
+    color: #fff;
+    padding: 28px 32px;
+    text-align: center;
+  }
+  .header h1 { font-size: 24px; margin-bottom: 4px; letter-spacing: 1px; }
+  .header p { font-size: 14px; opacity: 0.85; }
+  .section { padding: 0 24px; }
+  .section-title {
+    background: #1a73e8;
+    color: #fff;
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 18px;
+    border-radius: 6px 6px 0 0;
+    letter-spacing: 0.5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin-bottom: 12px;
+  }
+  table, th, td {
+    border: 1px solid #c4cdd5;
+  }
+  th {
+    background: #e3f0ff;
+    color: #0d47a1;
+    padding: 10px 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 12px;
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  td.center { text-align: center; vertical-align: middle; }
+  .info-table td:first-child {
+    background: #f0f6ff;
+    font-weight: 600;
+    width: 200px;
+    white-space: nowrap;
+  }
+  .score-input {
+    width: 60px;
+    padding: 5px 8px;
+    border: 1.5px solid #b0c4de;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a73e8;
+    background: #f8fbff;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .score-input:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
+  .comment-input {
+    width: 100%;
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 1.5px solid #b0c4de;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+    background: #f8fbff;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .comment-input:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
+  .stt { width: 40px; text-align: center; font-weight: 700; color: #1a73e8; }
+  .criteria-col { width: 42%; }
+  .detail-col { width: 28%; }
+  .score-col { width: 90px; }
+  .comment-col { width: 22%; }
+  .total-row td {
+    background: #e3f0ff;
+    font-weight: 700;
+    font-size: 15px;
+    color: #0d47a1;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .badge-green { background: #d4edda; color: #155724; }
+  .badge-blue { background: #d0e8ff; color: #0d47a1; }
+  .footer {
+    padding: 20px 24px 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+  }
+  .sign-box {
+    flex: 1;
+    min-width: 220px;
+    text-align: center;
+    padding: 12px;
+    border: 1px dashed #aaa;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+  .sign-box p { font-weight: 700; margin-bottom: 50px; font-size: 14px; }
+  .sign-box span { font-size: 12px; color: #888; }
+  .btn-group { text-align: center; padding: 16px 24px 24px; }
+  .btn {
+    padding: 11px 28px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    margin: 4px 6px;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: #1a73e8; color: #fff; }
+  .btn-primary:hover { background: #1558b0; }
+  .btn-success { background: #28a745; color: #fff; }
+  .btn-success:hover { background: #1e7e34; }
+  .btn-outline { background: #fff; color: #1a73e8; border: 2px solid #1a73e8; }
+  .btn-outline:hover { background: #e3f0ff; }
+  .highlight { background: #fffbe6; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .container { box-shadow: none; }
+    .btn-group { display: none; }
+    .score-input, .comment-input { border: 1px solid #999; }
+  }
+  @media (max-width: 700px) {
+    .header h1 { font-size: 18px; }
+    table { font-size: 12px; }
+    th, td { padding: 6px 8px; }
+    .score-input { width: 50px; }
+    .footer { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>📋 BẢNG TỰ ĐÁNH GIÁ NHÂN VIÊN</h1>
+    <p>Self-Assessment Form — Quý đánh giá</p>
+  </div>
+
+  <!-- 1. Thông tin cá nhân -->
+  <div class="section">
+    <div class="section-title">1. THÔNG TIN CÁ NHÂN</div>
+    <table class="info-table">
+      <tr><td>Họ và tên</td><td>Nguyễn Mai Gia Bảo</td></tr>
+      <tr><td>Vị trí</td><td>Intern Developer & Technical Support</td></tr>
+      <tr><td>Thời gian đánh giá</td><td>Quý ___/____</td></tr>
+      <tr><td>Phòng ban</td><td></td></tr>
+      <tr><td>Người quản lý</td><td></td></tr>
+    </table>
+  </div>
+
+  <!-- 2. Tổng quan công việc -->
+  <div class="section">
+    <div class="section-title">2. TỔNG QUAN CÔNG VIỆC</div>
+    <table>
+      <thead>
+        <tr>
+          <th class="stt">STT</th>
+          <th class="criteria-col">Nội dung công việc</th>
+          <th>Chi tiết / Mô tả</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="center">1</td><td>Support tính năng cho các Mall</td><td>EC, Evoucher, CMS,…</td></tr>
+        <tr><td class="center">2</td><td>Viết & chỉnh sửa SQL query</td><td>Kiểm tra, xử lý dữ liệu theo yêu cầu Mall; thực hiện CRUD cho các case phức tạp</td></tr>
+        <tr><td class="center">3</td><td>Xử lý bug</td><td>Liên quan đến database, API và logic nghiệp vụ</td></tr>
+        <tr><td class="center">4</td><td>Kiểm tra dữ liệu & debug</td><td>Hỗ trợ debug, xác định nguyên nhân lỗi</td></tr>
+        <tr><td class="center">5</td><td>Hỗ trợ AMHP</td><td>Set up bài viết, popup, banner, sự kiện,…</td></tr>
+        <tr><td class="center">6</td><td>Xử lý yêu cầu từ Mall</td><td>Liên quan đến dữ liệu và vận hành hệ thống</td></tr>
+        <tr><td class="center">7</td><td>Code tính năng</td><td>Tạo passcode cho các Mall, kiểm tra máy POS</td></tr>
+        <tr><td class="center">8</td><td>Đảm bảo tiến độ</td><td>Hoàn thành các task được giao đúng deadline</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. Kết quả đạt được - BẢNG CHẤM ĐIỂM -->
+  <div class="section">
+    <div class="section-title">3. KẾT QUẢ ĐẠT ĐƯỢC & CHẤM ĐIỂM</div>
+    <table>
+      <thead>
+        <tr>
+          <th class="stt">STT</th>
+          <th class="criteria-col">Tiêu chí đánh giá</th>
+          <th class="score-col">Tự chấm<br>(1–10)</th>
+          <th class="score-col">Quản lý<br>(1–10)</th>
+          <th class="comment-col">Nhận xét</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="center">1</td>
+          <td>Hoàn thành task đúng deadline và đảm bảo chất lượng</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="9"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">2</td>
+          <td>Khả năng tự xử lý task (SQL, dữ liệu, code) từ cơ bản đến phức tạp</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="8"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">3</td>
+          <td>Hiểu và nắm flow nghiệp vụ hệ thống (EC, Evoucher, CMS,…)</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="8"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">4</td>
+          <td>Khả năng debug và xác định nguyên nhân lỗi</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="8"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">5</td>
+          <td>Chủ động trong công việc, không phụ thuộc hoàn toàn vào mentor</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="9"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">6</td>
+          <td>Khả năng học nhanh và áp dụng vào thực tế</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="9"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">7</td>
+          <td>Trách nhiệm với task và đảm bảo tiến độ</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="9"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">8</td>
+          <td>Tư duy phân tích khi xử lý vấn đề (data & logic)</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="8"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">9</td>
+          <td>Đề xuất hướng xử lý cho các issue</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="7"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">10</td>
+          <td>Làm rõ requirement trước khi thực hiện</td>
+          <td class="center"><input type="number" class="score-input self-score" min="1" max="10" value="7"></td>
+          <td class="center"><input type="number" class="score-input mgr-score" min="1" max="10"></td>
+          <td><textarea class="comment-input" rows="2" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr class="total-row">
+          <td colspan="2" style="text-align:right; padding-right:20px;">TỔNG ĐIỂM TRUNG BÌNH</td>
+          <td class="center" id="selfAvg">—</td>
+          <td class="center" id="mgrAvg">—</td>
+          <td id="overallComment" style="font-size:13px;"></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px; color:#666; margin-bottom:12px; padding: 4px 0;">
+      <strong>Thang điểm:</strong> 1–4: Chưa đạt &nbsp;|&nbsp; 5–6: Cần cải thiện &nbsp;|&nbsp; 7–8: Đạt yêu cầu &nbsp;|&nbsp; 9–10: Xuất sắc
+    </p>
+  </div>
+
+  <!-- 4. Điểm mạnh -->
+  <div class="section">
+    <div class="section-title">4. ĐIỂM MẠNH NỔI BẬT</div>
+    <table>
+      <thead>
+        <tr>
+          <th class="stt">STT</th>
+          <th>Điểm mạnh</th>
+          <th class="comment-col">Nhận xét quản lý</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="center">1</td><td>Chủ động trong công việc và không phụ thuộc hoàn toàn vào mentor</td><td><textarea class="comment-input" rows="1" placeholder="Nhận xét..."></textarea></td></tr>
+        <tr><td class="center">2</td><td>Khả năng học nhanh và áp dụng vào thực tế</td><td><textarea class="comment-input" rows="1" placeholder="Nhận xét..."></textarea></td></tr>
+        <tr><td class="center">3</td><td>Có trách nhiệm với task và đảm bảo tiến độ</td><td><textarea class="comment-input" rows="1" placeholder="Nhận xét..."></textarea></td></tr>
+        <tr><td class="center">4</td><td>Có tư duy phân tích khi xử lý vấn đề (đặc biệt với data và logic)</td><td><textarea class="comment-input" rows="1" placeholder="Nhận xét..."></textarea></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. Điểm cần cải thiện -->
+  <div class="section">
+    <div class="section-title">5. ĐIỂM CẦN CẢI THIỆN</div>
+    <table>
+      <thead>
+        <tr>
+          <th class="stt">STT</th>
+          <th>Nội dung cần cải thiện</th>
+          <th class="score-col">Mức độ<br>ưu tiên</th>
+          <th class="comment-col">Nhận xét quản lý</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="center">1</td>
+          <td>Nâng cao khả năng xử lý các case phức tạp hơn</td>
+          <td class="center">
+            <select style="padding:4px;border-radius:4px;border:1px solid #b0c4de;font-size:12px;">
+              <option>Cao</option><option>Trung bình</option><option>Thấp</option>
+            </select>
+          </td>
+          <td><textarea class="comment-input" rows="1" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">2</td>
+          <td>Hiểu sâu hơn về hệ thống và kiến trúc tổng thể</td>
+          <td class="center">
+            <select style="padding:4px;border-radius:4px;border:1px solid #b0c4de;font-size:12px;">
+              <option>Cao</option><option>Trung bình</option><option>Thấp</option>
+            </select>
+          </td>
+          <td><textarea class="comment-input" rows="1" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">3</td>
+          <td>Cải thiện kỹ năng tối ưu query và performance</td>
+          <td class="center">
+            <select style="padding:4px;border-radius:4px;border:1px solid #b0c4de;font-size:12px;">
+              <option>Cao</option><option selected>Trung bình</option><option>Thấp</option>
+            </select>
+          </td>
+          <td><textarea class="comment-input" rows="1" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">4</td>
+          <td>Hạn chế sử dụng AI khi code, tự phân tích độc lập hơn</td>
+          <td class="center">
+            <select style="padding:4px;border-radius:4px;border:1px solid #b0c4de;font-size:12px;">
+              <option>Cao</option><option selected>Trung bình</option><option>Thấp</option>
+            </select>
+          </td>
+          <td><textarea class="comment-input" rows="1" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+        <tr>
+          <td class="center">5</td>
+          <td>Làm rõ requirement kỹ hơn trước khi thực hiện</td>
+          <td class="center">
+            <select style="padding:4px;border-radius:4px;border:1px solid #b0c4de;font-size:12px;">
+              <option>Cao</option><option selected>Trung bình</option><option>Thấp</option>
+            </select>
+          </td>
+          <td><textarea class="comment-input" rows="1" placeholder="Nhận xét..."></textarea></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. Định hướng phát triển -->
+  <div class="section">
+    <div class="section-title">6. ĐỊNH HƯỚNG PHÁT TRIỂN</div>
+    <table>
+      <thead>
+        <tr>
+          <th class="stt">STT</th>
+          <th>Mục tiêu</th>
+          <th class="comment-col">Ghi chú / Kế hoạch</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="center">1</td><td>Nâng cao kỹ năng SQL và tối ưu hiệu năng khi query</td><td><textarea class="comment-input" rows="1" placeholder="Kế hoạch cụ thể..."></textarea></td></tr>
+        <tr><td class="center">2</td><td>Hiểu sâu hơn về hệ thống và các flow nghiệp vụ</td><td><textarea class="comment-input" rows="1" placeholder="Kế hoạch cụ thể..."></textarea></td></tr>
+        <tr><td class="center">3</td><td>Cải thiện kỹ năng code để làm các task phát triển mới</td><td><textarea class="comment-input" rows="1" placeholder="Kế hoạch cụ thể..."></textarea></td></tr>
+        <tr><td class="center">4</td><td>Chủ động đề xuất giải pháp và cải tiến</td><td><textarea class="comment-input" rows="1" placeholder="Kế hoạch cụ thể..."></textarea></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. Đánh giá tổng thể -->
+  <div class="section">
+    <div class="section-title">7. ĐÁNH GIÁ TỔNG THỂ & MONG MUỐN</div>
+    <table>
+      <tr>
+        <td style="background:#f0f6ff;font-weight:700;width:200px;">Mức tự đánh giá</td>
+        <td>
+          <span class="badge badge-green">✅ Hoàn thành tốt vai trò Intern (~85–90%)</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f0f6ff;font-weight:700;">Mức đánh giá quản lý</td>
+        <td>
+          <select id="mgrOverall" style="padding:6px 12px;border-radius:5px;border:1.5px solid #b0c4de;font-size:13px;min-width:220px;">
+            <option value="">-- Chọn mức đánh giá --</option>
+            <option>Xuất sắc</option>
+            <option>Hoàn thành tốt</option>
+            <option>Đạt yêu cầu</option>
+            <option>Cần cải thiện</option>
+            <option>Chưa đạt</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f0f6ff;font-weight:700;">Mong muốn của nhân viên</td>
+        <td>
+          • Có cơ hội trở thành nhân viên chính thức, tham gia sâu hơn vào các task phát triển hệ thống<br>
+          • Được tham gia nhiều task có độ phức tạp cao hơn<br>
+          • Đóng góp nhiều hơn vào hiệu quả chung của team
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f0f6ff;font-weight:700;">Nhận xét tổng thể<br>của quản lý</td>
+        <td><textarea class="comment-input" rows="4" placeholder="Nhận xét tổng thể về nhân viên..."></textarea></td>
+      </tr>
+      <tr>
+        <td style="background:#f0f6ff;font-weight:700;">Đề xuất</td>
+        <td>
+          <select style="padding:6px 12px;border-radius:5px;border:1.5px solid #b0c4de;font-size:13px;min-width:220px;">
+            <option value="">-- Chọn đề xuất --</option>
+            <option>Chuyển thành nhân viên chính thức</option>
+            <option>Gia hạn thực tập</option>
+            <option>Cần đánh giá thêm</option>
+            <option>Kết thúc thực tập</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Kết luận -->
+  <div class="section" style="padding-bottom:10px;">
+    <div class="section-title" style="background:#0d47a1;">8. KẾT LUẬN</div>
+    <table>
+      <tr>
+        <td style="background:#fffbe6; line-height:1.7; padding:14px 16px;">
+          Trong thời gian thực tập, em đã chủ động học hỏi, thích nghi với môi trường làm việc và hoàn thành các nhiệm vụ được giao. Em tin rằng mình đã có đủ nền tảng để đảm nhận tốt hơn các công việc trong thời gian tới và sẵn sàng phát triển lên vị trí chính thức, đóng góp lâu dài cho team và công ty.
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Chữ ký -->
+  <div class="footer">
+    <div class="sign-box">
+      <p>Nhân viên ký tên</p>
+      <span>Nguyễn Mai Gia Bảo</span>
+    </div>
+    <div class="sign-box">
+      <p>Quản lý trực tiếp</p>
+      <span>Ký và ghi rõ họ tên</span>
+    </div>
+    <div class="sign-box">
+      <p>Trưởng phòng / HR</p>
+      <span>Ký và ghi rõ họ tên</span>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="btn-group">
+    <button class="btn btn-primary" onclick="calcScores()">📊 Tính điểm</button>
+    <button class="btn btn-success" onclick="window.print()">🖨️ In / Xuất PDF</button>
+    <button class="btn btn-outline" onclick="resetForm()">🔄 Reset</button>
+  </div>
+</div>
+
+<script>
+  function calcScores() {
+    const selfInputs = document.querySelectorAll('.self-score');
+    const mgrInputs = document.querySelectorAll('.mgr-score');
+
+    let selfTotal = 0, selfCount = 0;
+    let mgrTotal = 0, mgrCount = 0;
+
+    selfInputs.forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val) && val >= 1 && val <= 10) {
+        selfTotal += val;
+        selfCount++;
+      }
+    });
+
+    mgrInputs.forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val) && val >= 1 && val <= 10) {
+        mgrTotal += val;
+        mgrCount++;
+      }
+    });
+
+    const selfAvg = selfCount > 0 ? (selfTotal / selfCount).toFixed(1) : '—';
+    const mgrAvg = mgrCount > 0 ? (mgrTotal / mgrCount).toFixed(1) : '—';
+
+    document.getElementById('selfAvg').textContent = selfAvg;
+    document.getElementById('mgrAvg').textContent = mgrAvg;
+
+    let comment = '';
+    const avg = selfCount > 0 ? selfTotal / selfCount : 0;
+    if (avg >= 9) comment = '🌟 Xuất sắc';
+    else if (avg >= 7) comment = '✅ Đạt yêu cầu tốt';
+    else if (avg >= 5) comment = '⚠️ Cần cải thiện';
+    else if (avg > 0) comment = '❌ Chưa đạt';
+
+    document.getElementById('overallComment').textContent = comment;
+  }
+
+  function resetForm() {
+    document.querySelectorAll('.score-input').forEach(i => {
+      if (i.classList.contains('self-score')) { /* keep */ }
+      else { i.value = ''; }
+    });
+    document.querySelectorAll('.comment-input').forEach(t => t.value = '');
+    document.getElementById('selfAvg').textContent = '—';
+    document.getElementById('mgrAvg').textContent = '—';
+    document.getElementById('overallComment').textContent = '';
+  }
+
+  // Auto-calculate on load
+  calcScores();
+</script>
+
+</body>
+</html>
